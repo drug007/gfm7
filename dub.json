@@ -1,0 +1,82 @@
+{
+    "name": "gfm7",
+    "description": "D gamedev toolkit. OpenGL/SDL/FreeImage/Assimp wrapper, coloured logger",
+    "homepage": "http://github.com/d-gamedev-team/gfm/",
+    "copyright": "none",
+    "license": "public domain",
+
+    "authors": [
+        "Daniele Bondi / maeriden: Euler angles fix",
+        "Francesco Cattoglio: OpenGL wrapper improvements",
+        "John D. Cook: original SimpleRNG author",
+        "Steven Dwy / Yoplitein: sdl_mixer wrapper, documentation improvements",
+        "Daniel Cousens / RommelVR: GL fix",
+        "Gerbrand Kamphuis / vuaru: many fixes",
+        "Kyle Hunter / Kelet: ENet wrapper",
+        "Sam Hocevar: original author of some bits of code",
+        "Guillaume Piolat / ponce: main author of GFM",
+        "Ryan Roden-Corrent / rcorre: math package improvements",
+        "Tanel Tagaväli / clinei: SDL audio wrapper",
+        "H. S. Teoh / quickfur: wideint improvements"
+    ],
+
+    "targetType": "none",
+
+    "dependencies": {
+        "gfm7:core": "*",
+        "gfm7:assimp": "*",
+        "gfm7:freeimage": "*",
+        "gfm7:opengl": "*",
+        "gfm7:sdl2": "*",
+        "gfm7:logger": "*"
+    },
+
+    "subPackages": [
+        {
+            "name": "core",
+            "sourcePaths": [ "core/gfm/core" ],
+            "importPaths": [ "core" ]
+        },
+        {
+            "name": "assimp",
+            "sourcePaths": [ "assimp/gfm/assimp" ],
+            "importPaths": [ "assimp" ],
+            "dependencies": {
+                "derelict-assimp3": ">=2.0.0-beta.1 <3.0.0"
+            }
+        },
+        {
+            "name": "opengl",
+            "sourcePaths": [ "opengl/gfm/opengl" ],
+            "importPaths": [ "opengl" ],
+            "dependencies": {
+                "derelict-gl3": ">=2.0.0-beta.1 <3.0.0",
+                "gfm:math": "~>8.0.0"
+            }
+        },
+        {
+            "name": "sdl2",
+            "sourcePaths": [ "sdl2/gfm/sdl2" ],
+            "importPaths": [ "sdl2" ],
+            "dependencies": {
+                "derelict-sdl2": ">=3.0.0-beta.1 <4.0.0"
+            }
+        },
+        {
+            "name": "freeimage",
+            "sourcePaths": [ "freeimage/gfm/freeimage" ],
+            "importPaths": [ "freeimage" ],
+            "dependencies": {
+                "derelict-fi": ">=3.0.0-beta.1 <4.0.0"
+            }
+        },
+        {
+            "name": "logger",
+            "sourcePaths": [ "logger/gfm/logger" ],
+            "importPaths": [ "logger" ],
+            "dependencies": {
+                "colorize": "~>1.0"
+            }
+        },
+    ]
+}

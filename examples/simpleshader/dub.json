@@ -1,0 +1,14 @@
+{
+    "targetType": "executable",
+    "name": "simpleshader",
+    "sourcePaths": [ "." ],
+    "importPaths": [ "." ],
+    "mainSourceFile": "simpleshader.d",
+
+    "dependencies":
+    {
+        "gfm:sdl2": {"path": "../../"},
+        "gfm:opengl": {"path": "../../"},
+        "gfm:logger": {"path": "../../"}
+    }
+}

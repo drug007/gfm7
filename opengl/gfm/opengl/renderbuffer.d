@@ -16,11 +16,10 @@ final class GLRenderBuffer
         /// <p>If asking for a multisampled render buffer fails,
         /// a non multisampled buffer will be created instead.</p>
         /// Throws: $(D OpenGLException) if creation failed.
-        this(OpenGL gl, GLenum internalFormat, int width, int height, int samples = 0)
+        this(GLenum internalFormat, int width, int height, int samples = 0)
         {
-            _gl = gl;
             glGenRenderbuffers(1, &_handle);
-            gl.runtimeCheck();
+            runtimeCheck();
 
             use();
             scope(exit) unuse();
@@ -29,7 +28,8 @@ final class GLRenderBuffer
                 // fallback to non multisampled
                 if (glRenderbufferStorageMultisample is null)
                 {
-                    gl._logger.warningf("render-buffer multisampling is not supported, fallback to non-multisampled");
+                    if (_logger)
+                        _logger.warningf("render-buffer multisampling is not supported, fallback to non-multisampled");
                     goto non_mutisampled;
                 }
 
@@ -42,7 +42,8 @@ final class GLRenderBuffer
                 if (samples >= maxSamples)
                 {
                     int newSamples = clamp(samples, 0, maxSamples - 1);
-                    gl._logger.warningf(format("implementation does not support %s samples, fallback to %s samples", samples, newSamples));
+                    if (_logger)
+                        _logger.warningf(format("implementation does not support %s samples, fallback to %s samples", samples, newSamples));
                     samples = newSamples;
                 }
 
@@ -52,7 +53,8 @@ final class GLRenderBuffer
                 }
                 catch(OpenGLException e)
                 {
-                    _gl._logger.warning(e.msg);
+                    if (_logger)
+                        _logger.warning(e.msg);
                     goto non_mutisampled; // fallback to non multisampled
                 }
             }
@@ -60,7 +62,7 @@ final class GLRenderBuffer
             {
             non_mutisampled:
                 glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
-                gl.runtimeCheck();
+                runtimeCheck();
             }
 
             _initialized = true;
@@ -82,7 +84,7 @@ final class GLRenderBuffer
         void use()
         {
             glBindRenderbuffer(GL_RENDERBUFFER, _handle);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Unbinds this renderbuffer.
@@ -90,7 +92,7 @@ final class GLRenderBuffer
         void unuse()
         {
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Returns: Wrapped OpenGL resource handle.
@@ -98,6 +100,8 @@ final class GLRenderBuffer
         {
             return _handle;
         }
+
+        void logger(Logger l) { _logger = l; }
     }
 
     package
@@ -107,9 +111,11 @@ final class GLRenderBuffer
 
     private
     {
-        OpenGL _gl;
+        import std.experimental.logger : Logger;
+
         GLenum _format;
         GLenum _type;
         bool _initialized;
+        Logger _logger;
     }
 }

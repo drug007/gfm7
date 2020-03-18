@@ -22,12 +22,11 @@ class GLTexture
         /// Creates a texture. You should create a child class instead of calling
         /// this constructor directly.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLuint target)
+        this(GLuint target)
         {
-            _gl = gl;
             _target = target;
             glGenTextures(1, &_handle);
-            _gl.runtimeCheck();
+            runtimeCheck();
             _initialized = true;
             _textureUnit = -1;
         }
@@ -48,7 +47,7 @@ class GLTexture
         ///     textureUnit = Index of the texture unit to use.
         final void use(int textureUnit = 0)
         {
-            _gl.setActiveTexture(textureUnit);
+            setActiveTexture(textureUnit);
             bind();
         }
 
@@ -67,7 +66,7 @@ class GLTexture
             int res;
             bind();
             glGetTexParameteriv(_target, paramName, &res);
-            _gl.runtimeCheck();
+            runtimeCheck();
             return res;
         }
 
@@ -80,7 +79,7 @@ class GLTexture
             int res;
             bind();
             glGetTexLevelParameteriv(_target, level, paramName, &res);
-            _gl.runtimeCheck();
+            runtimeCheck();
             return res;
         }
 
@@ -90,7 +89,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_BASE_LEVEL, level);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture maximum level.
@@ -99,7 +98,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, level);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         // Texture "sampler" parameters which are now in Sampler Objects too
@@ -111,7 +110,7 @@ class GLTexture
         {
             bind();
             glTexParameterf(_target, GL_TEXTURE_MIN_LOD, lod);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture maximum LOD.
@@ -120,7 +119,7 @@ class GLTexture
         {
             bind();
             glTexParameterf(_target, GL_TEXTURE_MAX_LOD, lod);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture LOD bias.
@@ -129,7 +128,7 @@ class GLTexture
         {
             bind();
             glTexParameterf(_target, GL_TEXTURE_LOD_BIAS, lodBias);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the wrap mode for 1st texture coordinate.
@@ -138,7 +137,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_WRAP_S, wrapS);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the wrap mode for 2nd texture coordinate.
@@ -147,7 +146,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_WRAP_T, wrapT);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the wrap mode for 3rd texture coordinate.
@@ -156,7 +155,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_WRAP_R, wrapR);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture minification filter mode.
@@ -165,7 +164,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, minFilter);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture magnification filter mode.
@@ -174,7 +173,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, magFilter);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture anisotropic filter level.
@@ -184,7 +183,7 @@ class GLTexture
         {
             bind();
             glTexParameterf(_target, /* GL_TEXTURE_MAX_ANISOTROPY_EXT */ 0x84FE, f);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture border color.
@@ -193,7 +192,7 @@ class GLTexture
         {
             bind();
             glTexParameterfv(_target, GL_TEXTURE_BORDER_COLOR, color.ptr);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture compare mode.
@@ -202,7 +201,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_COMPARE_MODE, compareMode);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets the texture compare mode.
@@ -211,7 +210,7 @@ class GLTexture
         {
             bind();
             glTexParameteri(_target, GL_TEXTURE_COMPARE_FUNC, compareFunc);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Gets the texture data.
@@ -220,7 +219,7 @@ class GLTexture
         {
             bind();
             glGetTexImage(_target, level, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Returns: Wrapped OpenGL resource handle.
@@ -240,7 +239,7 @@ class GLTexture
         {
             bind();
             glGenerateMipmap(_target);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 
@@ -251,7 +250,6 @@ class GLTexture
 
     private
     {
-        OpenGL _gl;
         GLuint _handle;
         bool _initialized;
         int _textureUnit;
@@ -260,7 +258,7 @@ class GLTexture
         {
             // Bind on whatever the current texture unit is!
             glBindTexture(target, _handle);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -272,9 +270,9 @@ final class GLTexture1D : GLTexture
     {
         /// Creates a 1D texture.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_1D);
+            super(GL_TEXTURE_1D);
         }
 
         /// Sets texture content.
@@ -282,7 +280,7 @@ final class GLTexture1D : GLTexture
         void setImage(int level, GLint internalFormat, int width, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage1D(_target, level, internalFormat, width, border, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 
@@ -295,9 +293,9 @@ final class GLTexture2D : GLTexture
     {
         /// Creates a 2D texture.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_2D);
+            super(GL_TEXTURE_2D);
         }
 
         /// Sets texture content.
@@ -305,7 +303,7 @@ final class GLTexture2D : GLTexture
         void setImage(int level, GLint internalFormat, int width, int height, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage2D(_target, level, internalFormat, width, height, border, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 
@@ -318,9 +316,9 @@ final class GLTexture3D : GLTexture
     {
         /// Creates a 3D texture.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_3D);
+            super(GL_TEXTURE_3D);
         }
 
         /// Sets texture content.
@@ -328,7 +326,7 @@ final class GLTexture3D : GLTexture
         void setImage(int level, GLint internalFormat, int width, int height, int depth, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage3D(_target, level, internalFormat, width, height, depth, border, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -340,9 +338,9 @@ final class GLTexture1DArray : GLTexture
     {
         /// Creates a 1D texture array.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_1D_ARRAY);
+            super(GL_TEXTURE_1D_ARRAY);
         }
 
         /// Sets texture content.
@@ -350,7 +348,7 @@ final class GLTexture1DArray : GLTexture
         void setImage(int level, GLint internalFormat, int width, int height, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage2D(_target, level, internalFormat, width, height, border, format, type, null);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -362,9 +360,9 @@ final class GLTexture2DArray : GLTexture
     {
         /// Creates a 2D texture array.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_2D_ARRAY);
+            super(GL_TEXTURE_2D_ARRAY);
         }
 
         /// Sets texture content.
@@ -372,7 +370,7 @@ final class GLTexture2DArray : GLTexture
         void setImage(int level, GLint internalFormat, int width, int height, int depth, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage3D(_target, level, internalFormat, width, height, depth, border, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Sets partial texture content.
@@ -380,7 +378,7 @@ final class GLTexture2DArray : GLTexture
         void setSubImage(int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, GLenum format, GLenum type, void* data)
         {
             glTexSubImage3D(_target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -392,9 +390,9 @@ final class GLTextureRectangle : GLTexture
     {
         /// Creates a texture rectangle.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_RECTANGLE);
+            super(GL_TEXTURE_RECTANGLE);
         }
 
         /// Sets texture content.
@@ -402,7 +400,7 @@ final class GLTextureRectangle : GLTexture
         void setImage(int level, GLint internalFormat, int width, int height, int border, GLenum format, GLenum type, void* data)
         {
             glTexImage2D(_target, level, internalFormat, width, height, border, format, type, null);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -414,9 +412,9 @@ final class GLTexture2DMultisample : GLTexture
     {
         /// Creates a 2D multisampled texture.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_2D_MULTISAMPLE);
+            super(GL_TEXTURE_2D_MULTISAMPLE);
         }
 
         /// Sets texture content.
@@ -424,7 +422,7 @@ final class GLTexture2DMultisample : GLTexture
         void setImage(int level, int samples, GLint internalFormat, int width, int height, bool fixedsamplelocations)
         {
             glTexImage2DMultisample(_target, samples, internalFormat, width, height, fixedsamplelocations ? GL_TRUE : GL_FALSE);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }
@@ -436,9 +434,9 @@ final class GLTexture2DMultisampleArray : GLTexture
     {
         /// Creates a 2D multisampled texture array.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            super(gl, GL_TEXTURE_2D_MULTISAMPLE_ARRAY);
+            super(GL_TEXTURE_2D_MULTISAMPLE_ARRAY);
         }
 
         /// Sets texture content.
@@ -446,7 +444,7 @@ final class GLTexture2DMultisampleArray : GLTexture
         void setImage(int level, int samples, GLint internalFormat, int width, int height, int depth, bool fixedsamplelocations)
         {
             glTexImage3DMultisample(_target, samples, internalFormat, width, height, depth, fixedsamplelocations ? GL_TRUE : GL_FALSE);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }

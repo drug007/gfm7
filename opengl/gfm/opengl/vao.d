@@ -13,11 +13,10 @@ final class GLVAO
     {
         /// Creates a VAO.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            _gl = gl;
             glGenVertexArrays(1, &_handle);
-            gl.runtimeCheck();
+            runtimeCheck();
             _initialized = true;
         }
 
@@ -37,7 +36,7 @@ final class GLVAO
         void bind()
         {
             glBindVertexArray(_handle);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Unuses this VAO.
@@ -45,7 +44,7 @@ final class GLVAO
         void unbind()
         {
             glBindVertexArray(0);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Returns: Wrapped OpenGL resource handle.
@@ -57,7 +56,6 @@ final class GLVAO
 
     private
     {
-        OpenGL _gl;
         GLuint _handle;
         bool _initialized;
     }

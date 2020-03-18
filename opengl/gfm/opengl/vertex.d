@@ -47,7 +47,6 @@ final class VertexSpecification(Vertex)
         /// The program is used to find the attribute location.
         this(GLProgram program)
         {
-            _gl = program._gl;
             _program  = program;
 
             template isRWField(T, string M)
@@ -98,7 +97,7 @@ final class VertexSpecification(Vertex)
         {
             // use every attribute
             for (uint i = 0; i < _attributes.length; ++i)
-                _attributes[i].use(_gl, cast(GLsizei) vertexSize(), divisor);
+                _attributes[i].use(cast(GLsizei) vertexSize(), divisor);
         }
 
         /// Unuse this vertex specification. If you are using a VAO, you don't need to call it,
@@ -108,7 +107,7 @@ final class VertexSpecification(Vertex)
         {
             // unuse all the attributes
             for (uint i = 0; i < _attributes.length; ++i)
-                _attributes[i].unuse(_gl);
+                _attributes[i].unuse();
         }
 
         /// Returns the size of the Vertex; this size can be computer
@@ -121,7 +120,6 @@ final class VertexSpecification(Vertex)
 
     private
     {
-        OpenGL _gl;
         GLProgram _program;
         VertexAttribute[] _attributes;
     }
@@ -142,7 +140,7 @@ struct VertexAttribute
 
         /// Use this attribute.
         /// Throws: $(D OpenGLException) on error.
-        void use(OpenGL gl, GLsizei sizeOfVertex, GLuint divisor)
+        void use(GLsizei sizeOfVertex, GLuint divisor)
         {
             // fake attribute, do not enable
             if (location == GLAttribute.fakeLocation)
@@ -158,19 +156,19 @@ struct VertexAttribute
                 glVertexAttribPointer(location, n, glType, normalize, sizeOfVertex, cast(GLvoid*)offset);
             if(divisorSet)
                 glVertexAttribDivisor(location, divisor);
-            gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Unuse this attribute.
         /// Throws: $(D OpenGLException) on error.
-        void unuse(OpenGL gl)
+        void unuse()
         {
             // couldn't figure out if glDisableVertexAttribArray resets this, so play it safe
             if(divisorSet)
                 glVertexAttribDivisor(location, 0);
             divisorSet = false;
             glDisableVertexAttribArray(location);
-            gl.runtimeCheck();
+            runtimeCheck();
         }
     }
 }

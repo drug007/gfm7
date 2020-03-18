@@ -3,7 +3,8 @@ module gfm.opengl.program;
 import std.conv,
        std.string,
        std.regex,
-       std.algorithm;
+       std.algorithm,
+       std.experimental.logger;
 
 import derelict.opengl;
 
@@ -21,9 +22,8 @@ final class GLProgram
     {
         /// Creates an empty program.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl)
+        this()
         {
-            _gl = gl;
             _program = glCreateProgram();
             if (_program == 0)
                 throw new OpenGLException("glCreateProgram failed");
@@ -32,9 +32,9 @@ final class GLProgram
 
         /// Creates a program from a set of compiled shaders.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLShader[] shaders...)
+        this(GLShader[] shaders...)
         {
-            this(gl);
+            this();
             attach(shaders);
             link();
         }
@@ -94,9 +94,8 @@ final class GLProgram
          *
          * Throws: $(D OpenGLException) on error.
          */
-        this(OpenGL gl, string[] sourceLines)
+        this(string[] sourceLines)
         {
-            _gl = gl;
             bool[6] present;
             enum string[6] defines =
             [
@@ -144,12 +143,12 @@ final class GLProgram
                             debug
                                 throw new OpenGLException(message);
                             else
-                                gl._logger.warning(message);
+                                if (_logger) _logger.warning(message);
                         }
                         else
                         {
                             if (lineIndex != 0)
-                                gl._logger.warning("For maximum compatibility, #version directive should be the first line of your shader.");
+                                if (_logger) _logger.warning("For maximum compatibility, #version directive should be the first line of your shader.");
 
                             versionLine = cast(int)lineIndex;
                         }
@@ -179,20 +178,20 @@ final class GLProgram
                         if (cast(int)l != versionLine)
                             newSource ~= line;
 
-                    shaders ~= new GLShader(_gl, shaderTypes[i], newSource);
+                    shaders ~= new GLShader(shaderTypes[i], newSource);
                 }
             }
-            this(gl, shaders);
+            this(shaders);
 
             foreach(shader; shaders)
                 shader.destroy();
         }
 
         /// Ditto, except with lines in a single string.
-        this(OpenGL gl, string wholeSource)
+        this(string wholeSource)
         {
             // split on end-of-lines
-            this(gl, splitLines(wholeSource));
+            this(splitLines(wholeSource));
         }
 
         /// Releases the OpenGL program resource.
@@ -213,7 +212,7 @@ final class GLProgram
             foreach(shader; compiledShaders)
             {
                 glAttachShader(_program, shader._shader);
-                _gl.runtimeCheck();
+                runtimeCheck();
             }
         }
 
@@ -222,14 +221,14 @@ final class GLProgram
         void link()
         {
             glLinkProgram(_program);
-            _gl.runtimeCheck();
+            runtimeCheck();
             GLint res;
             glGetProgramiv(_program, GL_LINK_STATUS, &res);
             if (GL_TRUE != res)
             {
                 const(char)[] linkLog = getLinkLog();
-                if (linkLog != null)
-                    _gl._logger.errorf("%s", linkLog);
+                if (linkLog != null && _logger)
+                    _logger.errorf("%s", linkLog);
                 throw new OpenGLException("Cannot link program");
             }
 
@@ -261,10 +260,10 @@ final class GLProgram
                                        uniformIndex.ptr,
                                        GL_UNIFORM_BLOCK_INDEX,
                                        blockIndex.ptr);
-                _gl.runtimeCheck();
+                runtimeCheck();
 
                 // get active uniform blocks
-                getUniformBlocks(_gl, this);
+                getUniformBlocks(this);
 
                 for (GLint i = 0; i < numActiveUniforms; ++i)
                 {
@@ -281,9 +280,9 @@ final class GLProgram
                                        &size,
                                        &type,
                                        buffer.ptr);
-                    _gl.runtimeCheck();
+                    runtimeCheck();
                     string name = fromStringz(buffer.ptr).idup;
-                   _activeUniforms[name] = new GLUniform(_gl, _program, type, name, size);
+                   _activeUniforms[name] = new GLUniform(_program, type, name, size);
                 }
             }
 
@@ -303,12 +302,12 @@ final class GLProgram
                     GLenum type;
                     GLsizei length;
                     glGetActiveAttrib(_program, cast(GLuint)i, cast(GLint)(buffer.length), &length, &size, &type, buffer.ptr);
-                    _gl.runtimeCheck();
+                    runtimeCheck();
                     string name = fromStringz(buffer.ptr).idup;
                     GLint location = glGetAttribLocation(_program, buffer.ptr);
-                    _gl.runtimeCheck();
+                    runtimeCheck();
 
-                    _activeAttributes[name] = new GLAttribute(_gl, name, location, type, size);
+                    _activeAttributes[name] = new GLAttribute(name, location, type, size);
                 }
             }
 
@@ -319,7 +318,7 @@ final class GLProgram
         void use()
         {
             glUseProgram(_program);
-            _gl.runtimeCheck();
+            runtimeCheck();
 
             // upload uniform values then
             // this allow setting uniform at anytime without binding the program
@@ -334,7 +333,7 @@ final class GLProgram
             foreach(uniform; _activeUniforms)
                 uniform.unuse();
             glUseProgram(0);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Gets the linking report.
@@ -350,7 +349,7 @@ final class GLProgram
             char[] log = new char[logLength + 1];
             GLint dummy;
             glGetProgramInfoLog(_program, logLength, &dummy, log.ptr);
-            _gl.runtimeCheck();
+            runtimeCheck();
             return fromStringz(log.ptr);
         }
 
@@ -366,7 +365,7 @@ final class GLProgram
             {
                 // no such variable found, either it's really missing or the OpenGL driver discarded an unused uniform
                 // create a fake disabled GLUniform to allow the show to proceed
-                _activeUniforms[name] = new GLUniform(_gl, name);
+                _activeUniforms[name] = new GLUniform(name);
                 return _activeUniforms[name];
             }
             return *u;
@@ -382,7 +381,7 @@ final class GLProgram
             {
                 // no such attribute found, either it's really missing or the OpenGL driver discarded an unused uniform
                 // create a fake disabled GLattribute to allow the show to proceed
-                _activeAttributes[name] = new GLAttribute(_gl,name);
+                _activeAttributes[name] = new GLAttribute(name);
                 return _activeAttributes[name];
             }
             return *a;
@@ -395,13 +394,9 @@ final class GLProgram
         }
     }
 
-    package
-    {
-        OpenGL _gl;
-    }
-
     private
     {
+        Logger _logger;
         GLuint _program; // OpenGL handle
         bool _initialized;
         GLUniform[string] _activeUniforms;
@@ -418,9 +413,8 @@ final class GLAttribute
     {
         enum GLint fakeLocation = -1;
 
-        this(OpenGL gl, string name, GLint location, GLenum type, GLsizei size)
+        this(string name, GLint location, GLenum type, GLsizei size)
         {
-            _gl = gl;
             _name = name;
             _location = location;
             _type = type;
@@ -430,14 +424,13 @@ final class GLAttribute
 
         /// Creates a fake disabled attribute, designed to cope with attribute
         /// that have been optimized out by the OpenGL driver, or those which do not exist.
-        this(OpenGL gl, string name)
+        this(string name)
         {
-            _gl = gl;
             _disabled = true;
             _location = fakeLocation;
             _type = GL_FLOAT; // whatever
             _size = 1;
-            _gl._logger.warningf("Faking attribute '%s' which either does not exist in the shader program, or was discarded by the driver as unused", name);
+            if (_logger) _logger.warningf("Faking attribute '%s' which either does not exist in the shader program, or was discarded by the driver as unused", name);
         }
 
     }
@@ -454,7 +447,7 @@ final class GLAttribute
 
     private
     {
-        OpenGL _gl;
+        Logger _logger;
         GLint _location;
         GLenum _type;
         GLsizei _size;

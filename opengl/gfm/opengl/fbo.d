@@ -25,13 +25,12 @@ final class GLFBO
         /// Creates one FBO, with specified usage. OpenGL must have been loaded.
         /// $(D ARB_framebuffer_object) must be supported.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, Usage usage = Usage.DRAW)
+        this(Usage usage = Usage.DRAW)
         {
-            _gl = gl;
             glGenFramebuffers(1, &_handle);
-            _gl.runtimeCheck();
+            runtimeCheck();
 
-            _colors.length = _gl.maxColorAttachments();
+            _colors.length = maxColorAttachments();
             for(int i = 0; i < _colors.length; ++i)
                 _colors[i] = new GLFBOAttachment(this, GL_COLOR_ATTACHMENT0 + i);
 
@@ -89,7 +88,7 @@ final class GLFBO
         {
             glBindFramebuffer(_target, _handle);
 
-            _gl.runtimeCheck();
+            runtimeCheck();
             _isBound = true;
 
             for(int i = 0; i < _colors.length; ++i)
@@ -103,7 +102,7 @@ final class GLFBO
             _isBound = false;
             glBindFramebuffer(_target, 0);
 
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
        /// Returns: A FBO color attachment.
@@ -129,7 +128,6 @@ final class GLFBO
 
     private
     {
-        OpenGL _gl;
         GLuint  _handle;
         bool _initialized, _isBound;
 
@@ -260,7 +258,6 @@ final class GLFBOAttachment
         this(GLFBO fbo, GLenum attachment)
         {
             _fbo = fbo;
-            _gl = fbo._gl;
             _attachment = attachment;
             _lastCall = _newCall = Call(this, Call.Type.DISABLED, null, null, 0, 0);
         }
@@ -352,7 +349,7 @@ final class GLFBOAttachment
                             glFramebufferRenderbuffer(_outer._fbo._target, _outer._attachment, GL_RENDERBUFFER, renderBufferHandle);
                             break;
                     }
-                    _outer._gl.runtimeCheck();
+                    runtimeCheck();
                 }
             }
         }

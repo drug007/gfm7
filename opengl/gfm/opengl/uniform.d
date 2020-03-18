@@ -2,6 +2,7 @@ module gfm.opengl.uniform;
 
 import std.conv,
        std.string,
+       std.experimental.logger,
        core.stdc.string;
 
 import derelict.opengl;
@@ -37,9 +38,8 @@ final class GLUniform
         /// This is done automatically after linking a GLProgram.
         /// See_also: GLProgram.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLuint program, GLenum type, string name, GLsizei size)
+        this(GLuint program, GLenum type, string name, GLsizei size)
         {
-            _gl = gl;
             _type = type;
             _size = size;
             _name = name;
@@ -62,18 +62,17 @@ final class GLUniform
             }
             else
             {
-                _gl._logger.warningf("uniform %s is unrecognized or has size 0, disabled", _name);
+                if (_logger) _logger.warningf("uniform %s is unrecognized or has size 0, disabled", _name);
                 _disabled = true;
             }
         }
 
         /// Creates a fake disabled uniform variable, designed to cope with variables
         /// that have been optimized out by the OpenGL driver, or those which do not exist.
-        this(OpenGL gl, string name)
+        this(string name)
         {
-            _gl = gl;
             _disabled = true;
-            _gl._logger.warningf("Faking uniform '%s' which either does not exist in the shader program, or was discarded by the driver as unused", name);
+            if (_logger) _logger.warningf("Faking uniform '%s' which either does not exist in the shader program, or was discarded by the driver as unused", name);
         }
 
         /// Sets a uniform variable value.
@@ -148,11 +147,13 @@ final class GLUniform
         {
             return _name;
         }
+
+        void logger(Logger l) { _logger = l; }
     }
 
     private
     {
-        OpenGL _gl;
+        Logger _logger;
         GLint _location;
         GLenum _type;
         GLsizei _size;
@@ -171,7 +172,7 @@ final class GLUniform
             // safety check to prevent defaults values in uniforms
             if (_firstSet)
             {
-                _gl._logger.warningf("uniform '%s' left to default value, driver will probably zero it", _name);
+                if (_logger) _logger.warningf("uniform '%s' left to default value, driver will probably zero it", _name);
                 _firstSet = false;
             }
 
@@ -278,7 +279,7 @@ final class GLUniform
                 default:
                     break;
             }
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         public static bool typeIsCompliant(T)(GLenum type)

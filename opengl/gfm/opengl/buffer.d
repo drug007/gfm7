@@ -11,24 +11,23 @@ final class GLBuffer
     {
         /// Creates an empty buffer.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLuint target, GLuint usage)
+        this(GLuint target, GLuint usage)
         {
-            _gl = gl;
             _usage = usage;
             _target = target;
             _firstLoad = true;
 
             glGenBuffers(1, &_buffer);
-            gl.runtimeCheck();
+            runtimeCheck();
             _initialized = true;
             _size = 0;
         }
 
         /// Creates a buffer already filled with data.
         /// Throws: $(D OpenGLException) on error.
-        this(T)(OpenGL gl, GLuint target, GLuint usage, T[] buffer)
+        this(T)(GLuint target, GLuint usage, T[] buffer)
         {
-            this(gl, target, usage);
+            this(target, usage);
             setData(buffer);
         }
 
@@ -72,7 +71,7 @@ final class GLBuffer
             else
                 glBufferData(_target, size, data, _usage);
 
-            _gl.runtimeCheck();
+            runtimeCheck();
 
             _firstLoad = false;
         }
@@ -83,7 +82,7 @@ final class GLBuffer
         {
             bind();
             glBufferSubData(_target, offset, size, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Gets a sub-part of a buffer.
@@ -92,7 +91,7 @@ final class GLBuffer
         {
             bind();
             glGetBufferSubData(_target, offset, size, data);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Gets the whole buffer content in a newly allocated array.
@@ -110,7 +109,7 @@ final class GLBuffer
         void bind()
         {
             glBindBuffer(_target, _buffer);
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Unbinds this buffer.
@@ -129,7 +128,6 @@ final class GLBuffer
 
     private
     {
-        OpenGL _gl;
         GLuint _buffer;
         size_t _size;
         GLuint _target;

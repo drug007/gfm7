@@ -1,7 +1,8 @@
 module gfm.opengl.shader;
 
 import std.string,
-       std.conv;
+       std.conv,
+       std.experimental.logger;
 
 import derelict.opengl;
 
@@ -15,9 +16,8 @@ final class GLShader
     {
         /// Creates a shader devoid of source code.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLenum shaderType)
+        this(GLenum shaderType)
         {
-            _gl = gl;
             _shader = glCreateShader(shaderType);
             if (_shader == 0)
                 throw new OpenGLException("glCreateShader failed");
@@ -26,9 +26,9 @@ final class GLShader
 
         /// Creates a shader with source code and compiles it.
         /// Throws: $(D OpenGLException) on error.
-        this(OpenGL gl, GLenum shaderType, string[] lines)
+        this(GLenum shaderType, string[] lines)
         {
-            this(gl, shaderType);
+            this(shaderType);
             load(lines);
             compile();
         }
@@ -65,7 +65,7 @@ final class GLShader
                            cast(GLint)lineCount,
                            cast(const(char)**)addresses.ptr,
                            cast(const(int)*)(lengths.ptr));
-            _gl.runtimeCheck();
+            runtimeCheck();
         }
 
         /// Compile this OpenGL shader.
@@ -73,12 +73,12 @@ final class GLShader
         void compile()
         {
             glCompileShader(_shader);
-            _gl.runtimeCheck();
+            runtimeCheck();
 
             // print info log
             const(char)[] infoLog = getInfoLog();
-            if (infoLog != null)
-                _gl._logger.info(infoLog);
+            if (infoLog != null && _logger)
+                _logger.info(infoLog);
 
             GLint compiled;
             glGetShaderiv(_shader, GL_COMPILE_STATUS, &compiled);
@@ -100,9 +100,11 @@ final class GLShader
             char[] log = new char[logLength];
             GLint dummy;
             glGetShaderInfoLog(_shader, logLength, &dummy, log.ptr);
-            _gl.runtimeCheck();
+            runtimeCheck();
             return fromStringz(log.ptr);
         }
+
+        void logger(Logger l) { _logger = l; }
     }
 
     package
@@ -112,7 +114,7 @@ final class GLShader
 
     private
     {
-        OpenGL _gl;
+        Logger _logger;
         bool _initialized;
     }
 }

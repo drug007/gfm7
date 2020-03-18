@@ -128,19 +128,6 @@ final class OpenGL
         }
 
         /// Checks pending OpenGL errors.
-        /// Throws: $(D OpenGLException) if at least one OpenGL error was pending.
-        void runtimeCheck()
-        {
-            GLint r = glGetError();
-            if (r != GL_NO_ERROR)
-            {
-                string errorString = getErrorString(r);
-                flushGLErrors(); // flush other errors if any
-                throw new OpenGLException(errorString);
-            }
-        }
-
-        /// Checks pending OpenGL errors.
         /// Returns: true if at least one OpenGL error was pending. OpenGL error status is cleared.
         bool runtimeCheckNothrow() nothrow
         {
@@ -251,11 +238,11 @@ final class OpenGL
         /// See_also: $(WEB www.opengl.org/sdk/docs/man4/xhtml/glGet.xml).
         /// Note: It is generally a bad idea to call $(D glGetSomething) since it might stall
         ///       the OpenGL pipeline.
-        int getInteger(GLenum pname)
+        static int getInteger(GLenum pname)
         {
             GLint param;
             glGetIntegerv(pname, &param);
-            runtimeCheck();
+            .runtimeCheck();
             return param;
         }
 
@@ -263,11 +250,11 @@ final class OpenGL
         /// Returns: The requested float returned by $(D glGetFloatv).
         /// See_also: $(WEB www.opengl.org/sdk/docs/man4/xhtml/glGet.xml).
         /// Throws: $(D OpenGLException) if at least one OpenGL error was pending.
-        float getFloat(GLenum pname)
+        static float getFloat(GLenum pname)
         {
             GLfloat res;
             glGetFloatv(pname, &res);
-            runtimeCheck();
+            .runtimeCheck();
             return res;
         }
     }
@@ -276,37 +263,6 @@ final class OpenGL
     {
         Logger _logger;
 
-        static string getErrorString(GLint r) pure nothrow
-        {
-            switch(r)
-            {
-                case GL_NO_ERROR:          return "GL_NO_ERROR";
-                case GL_INVALID_ENUM:      return "GL_INVALID_ENUM";
-                case GL_INVALID_VALUE:     return "GL_INVALID_VALUE";
-                case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
-                case GL_OUT_OF_MEMORY:     return "GL_OUT_OF_MEMORY";
-               default:                   return "Unknown OpenGL error";
-            }
-        }
-
-    }
-
-    public
-    {
-        /// Returns: Maximum number of color attachments. This is the number of targets a fragment shader can output to.
-        /// You can rely on this number being at least 4 if MRT is supported.
-        int maxColorAttachments() pure const nothrow
-        {
-            return _maxColorAttachments;
-        }
-
-		/// Sets the "active texture" which is more precisely active texture unit.
-        /// Throws: $(D OpenGLException) on error.
-        void setActiveTexture(int texture)
-        {
-            glActiveTexture(GL_TEXTURE0 + texture);
-            runtimeCheck();
-        }
     }
 
     private
@@ -380,19 +336,67 @@ final class OpenGL
                 _maxColorAttachments = 0;
             }
         }
-
-        // flush out OpenGL errors
-        void flushGLErrors() nothrow
-        {
-            int timeout = 0;
-            while (++timeout <= 5) // avoid infinite loop in a no-driver situation
-            {
-                GLint r = glGetError();
-                if (r == GL_NO_ERROR)
-                    break;
-            }
-        }
     }
+
+    /// Checks pending OpenGL errors.
+    /// Throws: $(D OpenGLException) if at least one OpenGL error was pending.
+    void runtimeCheck()
+    {
+        .runtimeCheck();
+    }
+}
+
+private string getErrorString(GLint r) pure nothrow
+{
+    switch(r)
+    {
+        case GL_NO_ERROR:          return "GL_NO_ERROR";
+        case GL_INVALID_ENUM:      return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE:     return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY:     return "GL_OUT_OF_MEMORY";
+        default:                   return "Unknown OpenGL error";
+    }
+}
+
+// flush out OpenGL errors
+private void flushGLErrors() nothrow
+{
+    int timeout = 0;
+    while (++timeout <= 5) // avoid infinite loop in a no-driver situation
+    {
+        GLint r = glGetError();
+        if (r == GL_NO_ERROR)
+            break;
+    }
+}
+
+/// Checks pending OpenGL errors.
+/// Throws: $(D OpenGLException) if at least one OpenGL error was pending.
+void runtimeCheck()
+{
+    GLint r = glGetError();
+    if (r != GL_NO_ERROR)
+    {
+        string errorString = getErrorString(r);
+        flushGLErrors(); // flush other errors if any
+        throw new OpenGLException(errorString);
+    }
+}
+
+/// Sets the "active texture" which is more precisely active texture unit.
+/// Throws: $(D OpenGLException) on error.
+void setActiveTexture(int texture)
+{
+    glActiveTexture(GL_TEXTURE0 + texture);
+    runtimeCheck();
+}
+
+/// Returns: Maximum number of color attachments. This is the number of targets a fragment shader can output to.
+/// You can rely on this number being at least 4 if MRT is supported.
+int maxColorAttachments()
+{
+    return OpenGL.getInteger(GL_MAX_COLOR_ATTACHMENTS);
 }
 
 extern(System) private

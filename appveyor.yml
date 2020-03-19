@@ -1,0 +1,67 @@
+environment:
+    matrix:
+      - os: Visual Studio 2017
+        VS: 15
+        APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+  
+cache:
+  - C:\projects\cache\dmd2090_1.7z
+  - C:\projects\cache\ldc2-1.20.1.zip
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# scripts that run after cloning repository
+install:
+  # show environment
+  - set DC=dmd
+  - set
+  - cd c:\projects
+  - if not exist cache\nul mkdir cache
+  # Download & extract D compiler
+  - ps: |
+        If (-not (Test-Path 'cache\dmd2090_1.7z')) {
+            Start-FileDownload 'http://downloads.dlang.org/releases/2.x/2.090.1/dmd.2.090.1.windows.7z' -FileName 'cache\dmd2090_1.7z'
+        }
+        7z x cache\dmd2090_1.7z > $null
+        Set-Item -path env:DMD -value c:\projects\dmd2\windows\bin\dmd.exe
+        c:\projects\dmd2\windows\bin\dmd.exe --version
+
+        If (-not (Test-Path 'cache\ldc2-1.20.1.zip')) {
+            Start-FileDownload 'https://github.com/ldc-developers/ldc/releases/download/v1.20.1/ldc2-1.20.1-windows-x86.7z' -FileName 'cache\ldc2-1.20.1.zip'
+        }
+        7z x cache\ldc2-1.20.1.zip > $null
+        Set-Item -path env:DMD -value c:\projects\ldc2-1.20.1-windows-x86\bin\ldc2.exe
+        c:\projects\ldc2-1.20.1-windows-x86\bin\ldc2 --version
+  # configure DMD path
+  - reg add "HKLM\SOFTWARE\DMD" /v InstallationFolder /t REG_SZ /d c:\projects /reg:32 /f
+  # Set environment variables
+  - set PATH=c:\projects\dmd2\windows\bin;c:\projects\ldc2-1.20.1-windows-x86\bin\;%PATH%
+  - if not "%VS%" == "15" call "c:\Program Files (x86)\Microsoft Visual Studio %VS%.0\VC\vcvarsall.bat" x86
+  - if     "%VS%" == "15" call "c:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+build_script:
+  - cd c:\projects\gfm7
+  - dub test gfm7:core      -a x86    --compiler dmd
+  - dub test gfm7:core      -a x86_64 --compiler dmd
+  - dub test gfm7:core      -a x86    --compiler ldc2
+  - dub test gfm7:sdl2      -a x86    --compiler dmd
+  - dub test gfm7:sdl2      -a x86_64 --compiler dmd
+  - dub test gfm7:sdl2      -a x86    --compiler ldc2
+  - dub test gfm7:opengl    -a x86    --compiler dmd
+  - dub test gfm7:opengl    -a x86_64 --compiler dmd
+  - dub test gfm7:opengl    -a x86    --compiler ldc2
+  - dub test gfm7:assimp    -a x86    --compiler dmd
+  - dub test gfm7:assimp    -a x86_64 --compiler dmd
+  - dub test gfm7:assimp    -a x86    --compiler ldc2
+  - dub test gfm7:freeimage -a x86    --compiler dmd
+  - dub test gfm7:freeimage -a x86_64 --compiler dmd
+  - dub test gfm7:freeimage -a x86    --compiler ldc2
+  - dub test gfm7:logger    -a x86    --compiler dmd
+  - dub test gfm7:logger    -a x86_64 --compiler dmd
+  - dub test gfm7:logger    -a x86    --compiler ldc2

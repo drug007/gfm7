@@ -85,7 +85,7 @@ void main()
         #endif
     `;
 
-    auto program = scoped!GLProgram(gl, tunnelProgramSource);
+    auto program = scoped!GLProgram(tunnelProgramSource);
 
     // create noise texture
     int texWidth = 1024;
@@ -110,7 +110,7 @@ void main()
             texData[ind++] = grey;
             texData[ind++] = grey;
         }
-    auto noiseTexture = scoped!GLTexture2D(gl);
+    auto noiseTexture = scoped!GLTexture2D();
 
     noiseTexture.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
     noiseTexture.setMagFilter(GL_LINEAR);
@@ -134,12 +134,12 @@ void main()
     quad ~= Vertex(vec3f(-1, +1, 0), vec2f(0, 1));
     quad ~= Vertex(vec3f(-1, -1, 0), vec2f(0, 0));
 
-    auto quadVBO = scoped!GLBuffer(gl, GL_ARRAY_BUFFER, GL_STATIC_DRAW, quad[]);
+    auto quadVBO = scoped!GLBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, quad[]);
 
     // Create an OpenGL vertex description from the Vertex structure.
     auto quadVS = new VertexSpecification!Vertex(program);
 
-    auto vao = scoped!GLVAO(gl);
+    auto vao = scoped!GLVAO();
     double time = 0;
 
     uint lastTime = SDL_GetTicks();
@@ -208,7 +208,7 @@ class Postprocessing
 public:
     this(OpenGL gl, int screenWidth, int screenHeight)
     {
-        _screenBuf = new GLTexture2D(gl);
+        _screenBuf = new GLTexture2D();
         _screenBuf.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
         _screenBuf.setMagFilter(GL_LINEAR);
         _screenBuf.setWrapS(GL_CLAMP_TO_EDGE);
@@ -217,7 +217,7 @@ public:
         _screenBuf.generateMipmap();
 
 
-        _fbo = new GLFBO(gl);
+        _fbo = new GLFBO();
         _fbo.use();
         _fbo.color(0).attach(_screenBuf);
         _fbo.unuse();
@@ -257,7 +257,7 @@ public:
                 #endif
             `;
 
-        _program = new GLProgram(gl, postprocProgramSource);
+        _program = new GLProgram(postprocProgramSource);
     }
 
     ~this()

@@ -394,6 +394,10 @@ final class GLProgram
         }
     }
 
+    /// Sets a logger for the program. That allows additional output
+    /// besides error reporting.
+    void logger(Logger l) pure nothrow { _logger = l; }
+
     private
     {
         Logger _logger;

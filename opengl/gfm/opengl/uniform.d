@@ -148,7 +148,9 @@ final class GLUniform
             return _name;
         }
 
-        void logger(Logger l) { _logger = l; }
+        /// Sets a logger for the program. That allows additional output
+        /// besides error reporting.
+        void logger(Logger l) pure nothrow { _logger = l; }
     }
 
     private

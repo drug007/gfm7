@@ -104,7 +104,9 @@ final class GLShader
             return fromStringz(log.ptr);
         }
 
-        void logger(Logger l) { _logger = l; }
+        /// Sets a logger for the program. That allows additional output
+        /// besides error reporting.
+        void logger(Logger l) pure nothrow { _logger = l; }
     }
 
     package

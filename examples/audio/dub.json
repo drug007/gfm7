@@ -7,7 +7,7 @@
 
     "dependencies":
     {
-        "gfm:sdl2": {"path": "../../"},
-        "gfm:logger": {"path": "../../"}
+        "gfm7:sdl2": {"path": "../../"},
+        "gfm7:logger": {"path": "../../"}
     }
 }

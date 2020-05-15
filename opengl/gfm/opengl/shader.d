@@ -4,7 +4,7 @@ import std.string,
        std.conv,
        std.experimental.logger;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import gfm.opengl.opengl;
 

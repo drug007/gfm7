@@ -3,9 +3,8 @@ module gfm.sdl2.sdlmixer;
 import std.datetime;
 import std.string;
 
-import derelict.sdl2.sdl,
-       derelict.sdl2.mixer,
-       derelict.util.exception;
+import bindbc.sdl,
+       bindbc.sdl.mixer;
 
 import std.experimental.logger;
 
@@ -29,16 +28,20 @@ final class SDLMixer
             _sdl2 = sdl2;
             _logger = sdl2._logger;
             _SDLMixerInitialized = false;
-            
-            try
+
+            const ret = loadSDLMixer();
+            if(ret < sdlMixerSupport)
             {
-                DerelictSDL2Mixer.load();
+                if(ret == SDLMixerSupport.noLibrary)
+                    throwSDL2MixerException("SDL Mixer shared library failed to load");
+                else if(SDLMixerSupport.badLibrary)
+                    // One or more symbols failed to load. The likely cause is that the
+                    // shared library is for a lower version than bindbc-sdl was configured
+                    // to load (via SDL_201, SDL_202, etc.)
+                    throwSDL2MixerException("One or more symbols of SDL Mixer shared library failed to load");
+                throwSDL2MixerException("The version of the SDL Mixer library on your system is too low. Please upgrade.");
             }
-            catch(DerelictException e)
-            {
-                throw new SDL2Exception(e.msg);
-            }
-            
+
             if(Mix_Init(flags) != flags)
             {
                 throwSDL2MixerException("Mix_Init");

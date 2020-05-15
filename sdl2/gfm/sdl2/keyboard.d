@@ -1,6 +1,6 @@
 module gfm.sdl2.keyboard;
 
-import derelict.sdl2.sdl;
+import bindbc.sdl;
 import gfm.sdl2.sdl;
 
 

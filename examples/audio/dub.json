@@ -9,5 +9,6 @@
     {
         "gfm7:sdl2": {"path": "../../"},
         "gfm7:logger": {"path": "../../"}
-    }
+    },
+    "versions": [ "SDL_205"]
 }

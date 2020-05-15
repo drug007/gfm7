@@ -2,7 +2,7 @@ module gfm.sdl2.texture;
 
 import std.string;
 
-import derelict.sdl2.sdl;
+import bindbc.sdl;
 
 import gfm.sdl2.sdl,
        gfm.sdl2.surface,
@@ -149,24 +149,27 @@ final class SDL2Texture
                 _sdl2.throwSDL2Exception("SDL_UpdateTexture");
         }
 
-        /// Update a planar YV12 or IYUV texture with new pixel data.
-        /// See_also: $(LINK http://wiki.libsdl.org/SDL_UpdateYUVTexture)
-        /// Throws: $(D SDL2Exception) on error.
-        void updateYUVTexture(const(ubyte)* Yplane, int Ypitch, const(ubyte)* Uplane, int Upitch, const Uint8* Vplane, int Vpitch)
+        static if(sdlSupport >= SDLSupport.sdl201)
         {
-            int err = SDL_UpdateYUVTexture(_handle, null, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch);
-            if (err != 0)
-                _sdl2.throwSDL2Exception("SDL_UpdateYUVTexture");
-        }
+            /// Update a planar YV12 or IYUV texture with new pixel data.
+            /// See_also: $(LINK http://wiki.libsdl.org/SDL_UpdateYUVTexture)
+            /// Throws: $(D SDL2Exception) on error.
+            void updateYUVTexture(const(ubyte)* Yplane, int Ypitch, const(ubyte)* Uplane, int Upitch, const Uint8* Vplane, int Vpitch)
+            {
+                int err = SDL_UpdateYUVTexture(_handle, null, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch);
+                if (err != 0)
+                    _sdl2.throwSDL2Exception("SDL_UpdateYUVTexture");
+            }
 
-        /// Update a part of a planar YV12 or IYUV texture with new pixel data.
-        /// See_also: $(LINK http://wiki.libsdl.org/SDL_UpdateYUVTexture)
-        /// Throws: $(D SDL2Exception) on error.
-        void updateYUVTexture(const(SDL_Rect)* rect, const(ubyte)* Yplane, int Ypitch, const(ubyte)* Uplane, int Upitch, const Uint8* Vplane, int Vpitch)
-        {
-            int err = SDL_UpdateYUVTexture(_handle, rect, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch);
-            if (err != 0)
-                _sdl2.throwSDL2Exception("SDL_UpdateYUVTexture");
+            /// Update a part of a planar YV12 or IYUV texture with new pixel data.
+            /// See_also: $(LINK http://wiki.libsdl.org/SDL_UpdateYUVTexture)
+            /// Throws: $(D SDL2Exception) on error.
+            void updateYUVTexture(const(SDL_Rect)* rect, const(ubyte)* Yplane, int Ypitch, const(ubyte)* Uplane, int Upitch, const Uint8* Vplane, int Vpitch)
+            {
+                int err = SDL_UpdateYUVTexture(_handle, rect, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch);
+                if (err != 0)
+                    _sdl2.throwSDL2Exception("SDL_UpdateYUVTexture");
+            }
         }
 
         /// Returns: SDL handle.

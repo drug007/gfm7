@@ -11,7 +11,7 @@ module gfm.opengl;
 
 public
 {
-    import derelict.opengl;
+    import bindbc.opengl;
 
     import gfm.opengl.opengl,
            gfm.opengl.buffer,

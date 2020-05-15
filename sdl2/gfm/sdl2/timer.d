@@ -2,7 +2,7 @@ module gfm.sdl2.timer;
 
 import core.stdc.stdlib;
 
-import derelict.sdl2.sdl;
+import bindbc.sdl;
 
 import gfm.sdl2.sdl;
 

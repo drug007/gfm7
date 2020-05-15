@@ -2,9 +2,8 @@ module gfm.sdl2.sdlttf;
 
 import std.string;
 
-import derelict.sdl2.sdl,
-       derelict.sdl2.ttf,
-       derelict.util.exception;
+import bindbc.sdl,
+       bindbc.sdl.ttf;
 
 import std.experimental.logger;
 
@@ -24,13 +23,17 @@ final class SDLTTF
             _logger = sdl2._logger;
             _SDLTTFInitialized = false;
 
-            try
+            const ret = loadSDLTTF();
+            if(ret < sdlTTFSupport)
             {
-                DerelictSDL2ttf.load();
-            }
-            catch(DerelictException e)
-            {
-                throw new SDL2Exception(e.msg);
+                if(ret == SDLTTFSupport.noLibrary)
+                    throwSDL2TTFException("SDL TTF shared library failed to load");
+                else if(SDLTTFSupport.badLibrary)
+                    // One or more symbols failed to load. The likely cause is that the
+                    // shared library is for a lower version than bindbc-sdl was configured
+                    // to load (via SDL_201, SDL_202, etc.)
+                    throwSDL2TTFException("One or more symbols of SDL TTF shared library failed to load");
+                throwSDL2TTFException("The version of the SDL TTF library on your system is too low. Please upgrade.");
             }
 
             int res = TTF_Init();

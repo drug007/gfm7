@@ -2,7 +2,7 @@ module gfm.opengl.renderbuffer;
 
 import std.string;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import gfm.math.funcs,
        gfm.opengl.opengl;

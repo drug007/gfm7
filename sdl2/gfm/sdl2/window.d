@@ -2,7 +2,7 @@ module gfm.sdl2.window;
 
 import std.string;
 
-import derelict.sdl2.sdl;
+import bindbc.sdl;
 
 import std.experimental.logger;
 

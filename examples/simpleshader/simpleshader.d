@@ -2,7 +2,7 @@ import std.math,
        std.random,
        std.typecons;
 
-import derelict.util.loader;
+import bindbc.loader;
 
 import gfm.logger,
        gfm.sdl2,
@@ -27,8 +27,7 @@ void main()
     auto log = new ConsoleLogger();
 
     // load dynamic libraries
-    auto sdl2 = scoped!SDL2(log, SharedLibVersion(2, 0, 0));
-    auto gl = scoped!OpenGL(log);
+    auto sdl2 = scoped!SDL2(log);
 
     // You have to initialize each SDL subsystem you want by hand
     sdl2.subSystemInit(SDL_INIT_VIDEO);
@@ -44,7 +43,7 @@ void main()
                                     width, height,
                                     SDL_WINDOW_OPENGL);
 
-    gl.reload();
+    auto gl = scoped!OpenGL(log);
 
     // redirect OpenGL output to our Logger
     gl.redirectDebugOutput();

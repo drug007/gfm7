@@ -1,8 +1,5 @@
 import std.typecons;
 
-import derelict.sdl2.sdl;
-
-
 import gfm.logger,
        gfm.sdl2,
        gfm.sdl2.audio;
@@ -32,7 +29,7 @@ int main()
 {
     auto log = new ConsoleLogger;
 
-    auto sdl2 = scoped!SDL2(log, SharedLibVersion(2, 0, 5));
+    auto sdl2 = scoped!SDL2(log);
     sdl2.subSystemInit(SDL_INIT_AUDIO);
 
     ubyte* wavptr;
@@ -64,7 +61,6 @@ int main()
     while ( audio.length > 0 )
     {
         import core.thread;
-        import std;
         Thread.sleep(100.msecs);
     }
 

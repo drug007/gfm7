@@ -4,12 +4,12 @@ module gfm.sdl2;
 
 public
 {
-    import derelict.util.loader;
+    import bindbc.loader;
 
-    import derelict.sdl2.sdl,
-           derelict.sdl2.image,
-           derelict.sdl2.ttf,
-           derelict.sdl2.mixer;
+    import bindbc.sdl,
+           bindbc.sdl.image,
+           bindbc.sdl.ttf,
+           bindbc.sdl.mixer;
 
     import gfm.sdl2.sdl,
            gfm.sdl2.surface,

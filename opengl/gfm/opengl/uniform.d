@@ -5,7 +5,7 @@ import std.conv,
        std.experimental.logger,
        core.stdc.string;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import gfm.math.vector,
        gfm.math.matrix,

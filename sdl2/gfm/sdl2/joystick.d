@@ -3,7 +3,7 @@ module gfm.sdl2.joystick;
 import std.format : format;
 import std.string;
 
-import derelict.sdl2.sdl;
+import bindbc.sdl;
 
 import gfm.sdl2.sdl;
 

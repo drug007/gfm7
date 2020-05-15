@@ -10,5 +10,6 @@
         "gfm7:sdl2": {"path": "../../"},
         "gfm7:opengl": {"path": "../../"},
         "gfm7:logger": {"path": "../../"}
-    }
+    },
+    "versions": [ "SDL_205", "GL_33", "GL_ARB"]
 }

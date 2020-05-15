@@ -3,7 +3,7 @@ module gfm.opengl.texture;
 
 import std.string;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import gfm.opengl.opengl;
 import gfm.math.vector;

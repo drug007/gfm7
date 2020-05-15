@@ -2,9 +2,8 @@ module gfm.sdl2.sdlimage;
 
 import std.string;
 
-import derelict.util.exception,
-       derelict.sdl2.sdl,
-       derelict.sdl2.image;
+import bindbc.sdl,
+       bindbc.sdl.image;
 
 import std.experimental.logger;
 
@@ -25,13 +24,17 @@ final class SDLImage
             _logger = sdl2._logger;
             _SDLImageInitialized = false;
 
-            try
+            const ret = loadSDLImage();
+            if(ret < sdlImageSupport)
             {
-                DerelictSDL2Image.load();
-            }
-            catch(DerelictException e)
-            {
-                throw new SDL2Exception(e.msg);
+                if(ret == SDLImageSupport.noLibrary)
+                    throwSDL2ImageException("SDL Image shared library failed to load");
+                else if(SDLImageSupport.badLibrary)
+                    // One or more symbols failed to load. The likely cause is that the
+                    // shared library is for a lower version than bindbc-sdl was configured
+                    // to load (via SDL_201, SDL_202, etc.)
+                    throwSDL2ImageException("One or more symbols of SDL Image shared library failed to load");
+                throwSDL2ImageException("The version of the SDL Image library on your system is too low. Please upgrade.");
             }
 
             int inited = IMG_Init(flags);

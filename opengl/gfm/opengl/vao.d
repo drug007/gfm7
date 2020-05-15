@@ -2,7 +2,7 @@ module gfm.opengl.vao;
 
 import std.string;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import gfm.opengl.opengl;
 

@@ -2,7 +2,7 @@ module gfm.opengl.fbo;
 
 import std.string;
 
-import derelict.opengl;
+import bindbc.opengl;
 
 import std.experimental.logger;
 

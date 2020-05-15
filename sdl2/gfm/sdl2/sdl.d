@@ -6,10 +6,9 @@ import std.conv,
        std.string,
        std.array;
 
-import derelict.sdl2.sdl,
-       derelict.sdl2.image,
-       derelict.util.exception,
-       derelict.util.loader;
+import bindbc.sdl,
+       bindbc.sdl.image,
+       bindbc.loader;
 
 import std.experimental.logger;
 
@@ -40,25 +39,30 @@ final class SDL2
     {
         /// Load SDL2 library, redirect logging to our logger.
         /// You can pass a null logger if you don't want logging.
-        /// You can specify a minimum version of SDL2 you wish your project to support.
+        /// To specify a minimum version of SDL2 you need to use
+        /// compile time versions (SDL_201, SDL_202, etc.)
+        /// See_also: $(LINK https://github.com/BindBC/bindbc-sdl)
         /// Creating this object doesn't initialize any SDL subsystem!
         /// Params:
         ///     logger         = The logger to redirect logging to.
-        ///     sdl2Version    = The version of SDL2 to load. Defaults to SharedLibVersion(2, 0, 2).
         /// Throws: $(D SDL2Exception) on error.
         /// See_also: $(LINK http://wiki.libsdl.org/SDL_Init), $(D subSystemInit)
-        this(Logger logger, SharedLibVersion sdl2Version = SharedLibVersion(2, 0, 2))
+        this(Logger logger)
         {
             _logger = logger is null ? new NullLogger() : logger;
             _SDLInitialized = false;
             _SDL2LoggingRedirected = false;
-            try
+            const ret = loadSDL();
+            if(ret < sdlSupport)
             {
-                DerelictSDL2.load(sdl2Version);
-            }
-            catch(DerelictException e)
-            {
-                throw new SDL2Exception(e.msg);
+                if(ret == SDLSupport.noLibrary)
+                    throwSDL2Exception("SDL shared library failed to load");
+                else if(SDLSupport.badLibrary)
+                    // One or more symbols failed to load. The likely cause is that the
+                    // shared library is for a lower version than bindbc-sdl was configured
+                    // to load (via SDL_201, SDL_202, etc.)
+                    throwSDL2Exception("One or more symbols of SDL shared library failed to load");
+                throwSDL2Exception("The version of the SDL library on your system is too low. Please upgrade.");
             }
 
             // enable all logging, and pipe it to our own logger object
@@ -345,22 +349,25 @@ final class SDL2
             return res;
         }
 
-        /// Returns: A path suitable for writing configuration files, saved games, etc...
-        /// See_also: $(LINK http://wiki.libsdl.org/SDL_GetPrefPath)
-        /// Throws: $(D SDL2Exception) on error.
-        const(char)[] getPrefPath(string orgName, string applicationName)
+        static if(sdlSupport >= SDLSupport.sdl201)
         {
-            char* basePath = SDL_GetPrefPath(toStringz(orgName), toStringz(applicationName));
-            if (basePath != null)
+            /// Returns: A path suitable for writing configuration files, saved games, etc...
+            /// See_also: $(LINK http://wiki.libsdl.org/SDL_GetPrefPath)
+            /// Throws: $(D SDL2Exception) on error.
+            const(char)[] getPrefPath(string orgName, string applicationName)
             {
-                const(char)[] result = fromStringz(basePath);
-                SDL_free(basePath);
-                return result;
-            }
-            else
-            {
-                throwSDL2Exception("SDL_GetPrefPath");
-                return null; // unreachable
+                char* basePath = SDL_GetPrefPath(toStringz(orgName), toStringz(applicationName));
+                if (basePath != null)
+                {
+                    const(char)[] result = fromStringz(basePath);
+                    SDL_free(basePath);
+                    return result;
+                }
+                else
+                {
+                    throwSDL2Exception("SDL_GetPrefPath");
+                    return null; // unreachable
+                }
             }
         }
     }

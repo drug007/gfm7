@@ -7,11 +7,7 @@ import std.string,
        std.array,
        std.algorithm;
 
-public import derelict.opengl.types: GLVersion;
-import derelict.opengl;
-import derelict.util.exception;
-
-import derelict.opengl.gl;
+import bindbc.opengl;
 
 import std.experimental.logger;
 
@@ -53,25 +49,21 @@ final class OpenGL
         {
             _logger = logger is null ? new NullLogger() : logger;
 
-            ShouldThrow missingSymFunc( string symName )
+            const ret = loadOpenGL();
+            if(ret < glSupport)
             {
-                // Some NVIDIA drivers are missing these functions
-
-                if (symName == "glGetSubroutineUniformLocation")
-                    return ShouldThrow.No;
-
-                if (symName == "glVertexAttribL1d")
-                    return ShouldThrow.No;
-
-                // Any other missing symbol should throw.
-                return ShouldThrow.Yes;
+                if(ret == GLSupport.noLibrary)
+                    throw new OpenGLException("OpenGL shared library failed to load");
+                else if(GLSupport.badLibrary)
+                    // One or more symbols failed to load. The likely cause is that the
+                    // shared library is for a lower version than bindbc-sdl was configured
+                    // to load (via SDL_201, SDL_202, etc.)
+                    throw new OpenGLException("One or more symbols of OpenGL shared library failed to load");
+                else
+                    throw new OpenGLException("The version of the OpenGL library on your system is too low. Please upgrade.");
             }
 
-            DerelictGL3.missingSymbolCallback = &missingSymFunc;
-
-            DerelictGL3.load(); // load latest available version
-
-             getLimits(false);
+            getLimits(false);
         }
 
         /// Returns: true if the OpenGL extension is supported.
@@ -82,19 +74,6 @@ final class OpenGL
                     return true;
             return false;
         }
-
-        /// Reload OpenGL function pointers.
-        /// 
-        /// Once a first OpenGL context has been created,
-        /// you should call reload() to get the context you want.
-        /// This will attempt to load every OpenGL function except deprecated.
-        /// (warning, this may be dangerous because drivers may miss some functions).
-        void reload()
-        {
-            DerelictGL3.reload();
-            getLimits(true);
-        }
-
 
         /// Redirects OpenGL debug output to the Logger.
         /// You still has to use glDebugMessageControl to set which messages are emitted.

@@ -306,6 +306,12 @@ final class SDL2Window
                 throw new SDL2Exception("swapBuffers failed: not an OpenGL window");
             SDL_GL_SwapWindow(_window);
         }
+
+        /// Returns: Native SDL window context
+        SDL_Window* nativeWindow() nothrow @nogc pure @safe
+        {
+            return _window;
+        }
     }
 
     package

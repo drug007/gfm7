@@ -1,4 +1,4 @@
-# GFM7 [![Build Status](https://travis-ci.org/drug007/gfm7.svg?branch=master)](https://travis-ci.org/drug007/gfm7) [![Build status](https://ci.appveyor.com/api/projects/status/0vr19aqkhp34oaq2/branch/master?svg=true)](https://ci.appveyor.com/project/drug007/gfm7/branch/master)
+[![Testsuite](https://github.com/drug007/gfm7/actions/workflows/main.yml/badge.svg)](https://github.com/drug007/gfm7/actions/workflows/main.yml)
 
 GFM7 is a fork of [gfm](https://github.com/d-gamedev-team/gfm) v.7 to keep functionality that has been removed in gfm v.8
 

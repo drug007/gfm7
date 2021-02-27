@@ -1,0 +1,42 @@
+name: Testsuite
+
+on:
+  push:
+    branches: [ master, github-actions ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Latest stable version, update at will
+        os: [ macOS-10.15, ubuntu-18.04, windows-2019 ]
+        dc: [ dmd-latest, ldc-latest, dmd-master, ldc-master ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    # Compiler to test with
+    - name: Prepare compiler
+      uses: mihails-strasuns/setup-dlang@v1
+      with:
+        compiler: ${{ matrix.dc }}
+
+    # Checkout the repository
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: 'Build & Test'
+      run: |
+        dub build --compiler=${{ env.DC }} gfm7:core
+        dub test  --compiler=${{ env.DC }} gfm7:core
+        dub build --compiler=${{ env.DC }} gfm7:sdl2
+        dub test  --compiler=${{ env.DC }} gfm7:sdl2
+        dub build --compiler=${{ env.DC }} gfm7:opengl
+        dub test  --compiler=${{ env.DC }} gfm7:opengl
+        dub build --compiler=${{ env.DC }} gfm7:assimp
+        dub test  --compiler=${{ env.DC }} gfm7:assimp
+        dub build --compiler=${{ env.DC }} gfm7:freeimage
+        dub test  --compiler=${{ env.DC }} gfm7:freeimage

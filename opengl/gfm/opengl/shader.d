@@ -84,7 +84,7 @@ final class GLShader
             glGetShaderiv(_shader, GL_COMPILE_STATUS, &compiled);
 
             if (compiled != GL_TRUE)
-                throw new OpenGLException("shader did not compile");
+                throw new OpenGLException("shader did not compile:\n" ~ getInfoLog);
         }
 
         /// Gets the compiling report.

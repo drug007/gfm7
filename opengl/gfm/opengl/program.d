@@ -178,7 +178,14 @@ final class GLProgram
                         if (cast(int)l != versionLine)
                             newSource ~= line;
 
-                    shaders ~= new GLShader(shaderTypes[i], newSource);
+                    try 
+                        shaders ~= new GLShader(shaderTypes[i], newSource);
+                    catch(Exception e)
+                    {
+                        foreach(shader; shaders)
+                            shader.destroy();
+                        throw e;
+                    }
                 }
             }
             this(shaders);

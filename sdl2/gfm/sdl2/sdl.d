@@ -56,7 +56,9 @@ final class SDL2
             if(ret < sdlSupport)
             {
                 if(ret == SDLSupport.noLibrary)
-                    throwSDL2Exception("SDL shared library failed to load");
+                    // Exception is used because SDL2Exception to be
+                    // correctly thrown needs initialized SDL library
+                    throw new Exception("SDL shared library failed to load");
                 else if(SDLSupport.badLibrary)
                     // One or more symbols failed to load. The likely cause is that the
                     // shared library is for a lower version than bindbc-sdl was configured

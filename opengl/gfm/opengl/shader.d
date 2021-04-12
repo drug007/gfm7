@@ -29,8 +29,17 @@ final class GLShader
         this(GLenum shaderType, string[] lines)
         {
             this(shaderType);
-            load(lines);
-            compile();
+            try
+            {
+                load(lines);
+                compile();
+            }
+            catch(Exception e)
+            {
+                glDeleteShader(_shader);
+                _initialized = false;
+                throw e;
+            }
         }
 
         /// Releases the OpenGL shader resource.

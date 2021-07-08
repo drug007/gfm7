@@ -66,7 +66,8 @@ extern(C) private nothrow
             // No Throwable is supposed to cross C callbacks boundaries
             // Crash immediately
             exit(-1);
-            return 0;
+            static if (__VERSION__ < 2097)
+                return 0;
         }
     }
 }

@@ -66,8 +66,26 @@ extern(C) private nothrow
             // No Throwable is supposed to cross C callbacks boundaries
             // Crash immediately
             exit(-1);
-            static if (__VERSION__ < 2097)
+            static if (!codeAfterExitIsDead)
                 return 0;
         }
     }
 }
+
+private struct TestIfCodeAfterExitIsDead
+{
+    static int test()()
+    {
+        try
+        {
+            return 0;
+        }
+        catch (Throwable e)
+        {
+            exit(-1);
+        }
+    }
+}
+
+/// Does this compiler deduces that code after `exit()` is dead?
+enum codeAfterExitIsDead = __traits(compiles, TestIfCodeAfterExitIsDead.test());

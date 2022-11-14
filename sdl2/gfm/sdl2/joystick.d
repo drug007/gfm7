@@ -86,7 +86,7 @@ final class SDLJoystick
         char[32] buffer;
         SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(this._joystick), buffer.ptr, buffer.length);
 
-        return buffer[].assumeUnique.fromStringz;
+        return buffer[].assumeUnique.fromStringz.dup;
     }
 
     @property bool attached()

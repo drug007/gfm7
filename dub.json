@@ -50,7 +50,7 @@
             "sourcePaths": [ "opengl/gfm/opengl" ],
             "importPaths": [ "opengl" ],
             "dependencies": {
-                "bindbc-opengl": "~>0.15.0",
+                "bindbc-opengl": "~>1.0.3",
                 "gfm:math": "~>8.0.0"
             },
             "configurations" : [
@@ -68,7 +68,7 @@
             "sourcePaths": [ "sdl2/gfm/sdl2" ],
             "importPaths": [ "sdl2" ],
             "dependencies": {
-                "bindbc-sdl": "~>0.19.2"
+                "bindbc-sdl": "~>1.2.2"
             },
             "versions": [
                 "SDL_Image",

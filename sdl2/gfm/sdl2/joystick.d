@@ -81,7 +81,12 @@ final class SDLJoystick
 
     @property string guidString()
     {
-        return cast(string)SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(this._joystick)).fromStringz;
+        import std.exception : assumeUnique;
+
+        char[32] buffer;
+        SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(this._joystick), buffer.ptr, buffer.length);
+
+        return buffer[].assumeUnique.fromStringz;
     }
 
     @property bool attached()

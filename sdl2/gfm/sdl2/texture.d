@@ -97,7 +97,7 @@ final class SDL2Texture
         /// Throws: $(D SDL2Exception) on error.
         int access()
         {
-            int res;
+            SDL_TextureAccess res;
             int err = SDL_QueryTexture(_handle, null, &res, null, null);
             if (err != 0)
                 _sdl2.throwSDL2Exception("SDL_QueryTexture");

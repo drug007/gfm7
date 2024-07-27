@@ -3,7 +3,7 @@ module gfm.sdl2.sdlimage;
 import std.string;
 
 import bindbc.sdl,
-       bindbc.sdl.image;
+       sdl_image;
 
 import std.experimental.logger;
 
@@ -24,12 +24,12 @@ final class SDLImage
             _logger = sdl2._logger;
             _SDLImageInitialized = false;
 
-            const ret = loadSDLImage();
+            auto ret = loadSDLImage();
             if(ret < sdlImageSupport)
             {
                 if(ret == SDLImageSupport.noLibrary)
                     throwSDL2ImageException("SDL Image shared library failed to load");
-                else if(SDLImageSupport.badLibrary)
+                else if(ret == SDLImageSupport.badLibrary)
                     // One or more symbols failed to load. The likely cause is that the
                     // shared library is for a lower version than bindbc-sdl was configured
                     // to load (via SDL_201, SDL_202, etc.)

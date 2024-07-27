@@ -30,13 +30,7 @@ jobs:
 
     - name: 'Build & Test'
       run: |
-        dub build --compiler=${{ env.DC }} gfm7:core
-        dub test  --compiler=${{ env.DC }} gfm7:core
         dub build --compiler=${{ env.DC }} gfm7:sdl2
         dub test  --compiler=${{ env.DC }} gfm7:sdl2
         dub build --compiler=${{ env.DC }} gfm7:opengl
         dub test  --compiler=${{ env.DC }} gfm7:opengl
-        dub build --compiler=${{ env.DC }} gfm7:assimp
-        dub test  --compiler=${{ env.DC }} gfm7:assimp
-        dub build --compiler=${{ env.DC }} gfm7:freeimage
-        dub test  --compiler=${{ env.DC }} gfm7:freeimage

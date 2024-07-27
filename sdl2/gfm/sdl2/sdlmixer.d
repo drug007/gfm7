@@ -4,7 +4,7 @@ import std.datetime;
 import std.string;
 
 import bindbc.sdl,
-       bindbc.sdl.mixer;
+       sdl_mixer;
 
 import std.experimental.logger;
 
@@ -29,12 +29,12 @@ final class SDLMixer
             _logger = sdl2._logger;
             _SDLMixerInitialized = false;
 
-            const ret = loadSDLMixer();
+            auto ret = loadSDLMixer();
             if(ret < sdlMixerSupport)
             {
                 if(ret == SDLMixerSupport.noLibrary)
                     throwSDL2MixerException("SDL Mixer shared library failed to load");
-                else if(SDLMixerSupport.badLibrary)
+                else if(ret == SDLMixerSupport.badLibrary)
                     // One or more symbols failed to load. The likely cause is that the
                     // shared library is for a lower version than bindbc-sdl was configured
                     // to load (via SDL_201, SDL_202, etc.)

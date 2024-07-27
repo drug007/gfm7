@@ -149,7 +149,7 @@ final class SDL2Texture
                 _sdl2.throwSDL2Exception("SDL_UpdateTexture");
         }
 
-        static if(sdlSupport >= SDLSupport.sdl201)
+        static if(sdlSupport >= SDLSupport.v2_0_1)
         {
             /// Update a planar YV12 or IYUV texture with new pixel data.
             /// See_also: $(LINK http://wiki.libsdl.org/SDL_UpdateYUVTexture)

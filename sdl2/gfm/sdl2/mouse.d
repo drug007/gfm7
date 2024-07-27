@@ -73,7 +73,7 @@ final class SDL2Mouse
             return value;
         }
 
-        static if(sdlSupport >= SDLSupport.sdl204)
+        static if(sdlSupport >= SDLSupport.v2_0_4)
         {
             /// Use this function to capture the mouse and to track input outside an SDL window.
             /// See_also: $(LINK https://wiki.libsdl.org/SDL_CaptureMouse)

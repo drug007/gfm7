@@ -7,9 +7,9 @@ public
     import bindbc.loader;
 
     import bindbc.sdl,
-           bindbc.sdl.image,
-           bindbc.sdl.ttf,
-           bindbc.sdl.mixer;
+           sdl_image,
+           sdl_ttf,
+           sdl_mixer;
 
     import gfm.sdl2.sdl,
            gfm.sdl2.surface,

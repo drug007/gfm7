@@ -7,7 +7,6 @@ import std.conv,
        std.array;
 
 import bindbc.sdl,
-       bindbc.sdl.image,
        bindbc.loader;
 
 import std.experimental.logger;
@@ -52,14 +51,14 @@ final class SDL2
             _logger = logger is null ? new NullLogger() : logger;
             _SDLInitialized = false;
             _SDL2LoggingRedirected = false;
-            const ret = loadSDL();
+            auto ret = loadSDL();
             if(ret < sdlSupport)
             {
                 if(ret == SDLSupport.noLibrary)
                     // Exception is used because SDL2Exception to be
                     // correctly thrown needs initialized SDL library
                     throw new Exception("SDL shared library failed to load");
-                else if(SDLSupport.badLibrary)
+                else if(ret == SDLSupport.badLibrary)
                     // One or more symbols failed to load. The likely cause is that the
                     // shared library is for a lower version than bindbc-sdl was configured
                     // to load (via SDL_201, SDL_202, etc.)
@@ -351,7 +350,7 @@ final class SDL2
             return res;
         }
 
-        static if(sdlSupport >= SDLSupport.sdl201)
+        static if(sdlSupport >= SDLSupport.v2_0_1)
         {
             /// Returns: A path suitable for writing configuration files, saved games, etc...
             /// See_also: $(LINK http://wiki.libsdl.org/SDL_GetPrefPath)
